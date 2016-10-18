@@ -6,7 +6,7 @@ import (
 )
 
 import (
-	"github.com/sternix/commands/lib"
+	"github.com/sternix/lib"
 )
 
 const (
@@ -53,15 +53,12 @@ func Set(name string, value string) error {
 	if bptrname, err = syscall.BytePtrFromString(name); err != nil {
 		return err
 	}
-
 	if bptrvalue, err = syscall.BytePtrFromString(value); err != nil {
 		return err
 	}
-
 	if _, err = kenv_sys(SET, unsafe.Pointer(bptrname), unsafe.Pointer(bptrvalue), len(value)+1); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -74,11 +71,9 @@ func Unset(name string) error {
 	if bptr, err = syscall.BytePtrFromString(name); err != nil {
 		return err
 	}
-
 	if _, err = kenv_sys(UNSET, unsafe.Pointer(bptr), unsafe.Pointer(nil), 0); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -92,18 +87,15 @@ func Dump() ([]string, error) {
 	if envlen, err = kenv_sys(DUMP, unsafe.Pointer(nil), unsafe.Pointer(nil), 0); err != nil {
 		return nil, err
 	}
-
 	// get envs to buffer
 	buf := make([]byte, envlen+1)
 	if _, err = kenv_sys(DUMP, unsafe.Pointer(nil), unsafe.Pointer(&buf[0]), len(buf)); err != nil {
 		return nil, err
 	}
-
 	// remove last null term
 	if buf[len(buf)-1] == '\x00' {
 		buf = buf[:len(buf)-1]
 	}
-
 	// remove all c null term character (\x00) from string
 	return lib.CStrToStrSlice(buf), nil
 }

@@ -35,7 +35,6 @@ func NameToMIB(name string) (mib []_C_int, err error) {
 	if err != nil {
 		return nil, err
 	}
-
 	if err = sysctl([]_C_int{0, 3}, p, &n, &bytes[0], uintptr(len(name))); err != nil {
 		return nil, err
 	}
@@ -66,11 +65,9 @@ func sysctlmib(name string, args ...int) ([]_C_int, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	for _, a := range args {
 		mib = append(mib, _C_int(a))
 	}
-
 	return mib, nil
 }
 

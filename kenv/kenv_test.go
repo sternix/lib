@@ -9,7 +9,7 @@ import (
 )
 
 import (
-	"github.com/sternix/commands/lib/kenv"
+	"github.com/sternix/lib/kenv"
 )
 
 func kenvsFromCmd(t *testing.T) []string {
@@ -17,7 +17,6 @@ func kenvsFromCmd(t *testing.T) []string {
 	if err != nil {
 		t.Error(err)
 	}
-
 	kenvs := strings.Split(string(out), "\n")
 	kenvs = kenvs[:len(kenvs)-1] //remove last newline
 	return kenvs
@@ -36,17 +35,14 @@ func TestKenvGet(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-
 		kenvs[strs[0]] = val
 	}
-
 	// for each key call kenv.Get and check value
 	for k, v := range kenvs {
 		get, err := kenv.Get(k)
 		if err != nil {
 			t.Error(err)
 		}
-
 		if get != v {
 			t.Errorf("k:%q = get:%q , expected v:%q", k, get, v)
 		}
@@ -55,12 +51,10 @@ func TestKenvGet(t *testing.T) {
 
 func TestKenvDump(t *testing.T) {
 	fromCmd := kenvsFromCmd(t)
-
 	kenvs, err := kenv.Dump()
 	if err != nil {
 		t.Error(err)
 	}
-
 	var fromLib []string
 	for _, item := range kenvs {
 		keyval := strings.Split(item, "=")
@@ -69,11 +63,9 @@ func TestKenvDump(t *testing.T) {
 		}
 		fromLib = append(fromLib, fmt.Sprintf("%s=\"%s\"", keyval[0], keyval[1]))
 	}
-
 	if len(fromLib) != len(fromCmd) {
 		t.Errorf("cmd has %d item but lib has %d", len(fromCmd), len(fromLib))
 	}
-
 	for i, ke := range fromCmd {
 		if fromLib[i] != ke {
 			t.Errorf("lib %s different than %s", fromLib[i], ke)
