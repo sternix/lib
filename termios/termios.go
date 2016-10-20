@@ -5,8 +5,7 @@ import (
 )
 
 import (
-	//	"github.com/sternix/lib/termios/ioctl"
-	"./ioctl"
+	"github.com/sternix/lib/termios/ioctl"
 )
 
 func Tcgetattr(fd uintptr, termios *syscall.Termios) error {
