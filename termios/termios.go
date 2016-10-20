@@ -2,39 +2,41 @@ package termios
 
 import (
 	"syscall"
-	"unsafe"
+)
+
+import (
+	//	"github.com/sternix/lib/termios/ioctl"
+	"./ioctl"
 )
 
 func Tcgetattr(fd uintptr, termios *syscall.Termios) error {
-	return ioctl(fd, TIOCGETA, uintptr(unsafe.Pointer(termios)))
+	return ioctl.Termios(fd, TIOCGETA, termios)
 }
 
 func Tcsetattr(fd uintptr, opt int, termios *syscall.Termios) error {
-	ptr := uintptr(unsafe.Pointer(termios))
-
 	if (opt & TCSASOFT) == 1 {
 		termios.Cflag |= CIGNORE
 	}
 
 	switch opt & ^TCSASOFT {
 	case TCSANOW:
-		return ioctl(fd, TIOCSETA, ptr)
+		return ioctl.Termios(fd, TIOCSETA, termios)
 	case TCSADRAIN:
-		return ioctl(fd, TIOCSETAW, ptr)
+		return ioctl.Termios(fd, TIOCSETAW, termios)
 	case TCSAFLUSH:
-		return ioctl(fd, TIOCSETAF, ptr)
+		return ioctl.Termios(fd, TIOCSETAF, termios)
 	default:
 		return syscall.EINVAL
 	}
 }
 
 func Tcsetpgrp(fd uintptr, pid int) error {
-	return ioctl(fd, TIOCSPGRP, uintptr(unsafe.Pointer(&pid)))
+	return ioctl.Int(fd, TIOCSPGRP, &pid)
 }
 
 func Tcgetpgrp(fd uintptr) (int, error) {
 	var s int
-	err := ioctl(fd, TIOCGPGRP, uintptr(unsafe.Pointer(&s)))
+	err := ioctl.Int(fd, TIOCGPGRP, &s)
 	if err != nil {
 		return -1, err
 	}
@@ -43,11 +45,10 @@ func Tcgetpgrp(fd uintptr) (int, error) {
 
 func Tcgetsid(fd uintptr) (int, error) {
 	var s int
-	err := ioctl(fd, TIOCGSID, uintptr(unsafe.Pointer(&s)))
+	err := ioctl.Int(fd, TIOCGSID, &s)
 	if err != nil {
 		return -1, err
 	}
-
 	return s, nil
 }
 
@@ -56,7 +57,7 @@ func Tcsetsid(fd uintptr, pid int) error {
 	if pid != sid {
 		return syscall.EINVAL
 	}
-	return ioctl(fd, TIOCSCTTY, uintptr(0))
+	return ioctl.Null(fd, TIOCSCTTY)
 }
 
 func Cfgetospeed(termios *syscall.Termios) uint32 {
@@ -105,12 +106,12 @@ func Tcsendbreak(fd uintptr) error {
 	var sleepyTime syscall.Timeval
 	sleepyTime.Sec = 0
 	sleepyTime.Usec = 400000
-	err := ioctl(fd, TIOCSBRK, uintptr(0))
+	err := ioctl.Zero(fd, TIOCSBRK)
 	if err != nil {
 		return err
 	}
 	syscall.Select(0, nil, nil, nil, &sleepyTime)
-	err = ioctl(fd, TIOCCBRK, uintptr(0))
+	err = ioctl.Zero(fd, TIOCCBRK)
 	if err != nil {
 		return err
 	}
@@ -118,7 +119,7 @@ func Tcsendbreak(fd uintptr) error {
 }
 
 func Tcdrain(fd uintptr) error {
-	return ioctl(fd, TIOCDRAIN, uintptr(0))
+	return ioctl.Zero(fd, TIOCDRAIN)
 }
 
 func Tcflush(fd uintptr, which int) error {
@@ -135,7 +136,7 @@ func Tcflush(fd uintptr, which int) error {
 		return syscall.EINVAL
 	}
 
-	return ioctl(fd, TIOCFLUSH, uintptr(com))
+	return ioctl.Int(fd, TIOCFLUSH, &com)
 }
 
 func Tcflow(fd uintptr, action int) error {
@@ -146,9 +147,9 @@ func Tcflow(fd uintptr, action int) error {
 
 	switch action {
 	case TCOOFF:
-		return ioctl(fd, TIOCSTOP, uintptr(0))
+		return ioctl.Zero(fd, TIOCSTOP)
 	case TCOON:
-		return ioctl(fd, TIOCSTART, uintptr(0))
+		return ioctl.Zero(fd, TIOCSTART)
 	case TCION:
 	case TCIOFF:
 		if err := Tcgetattr(fd, &term); err != nil {
