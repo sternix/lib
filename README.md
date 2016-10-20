@@ -1,2 +1,2 @@
 # lib
-go syscalls that not include in std lib
+FreeBSD syscalls that does not include in the go syscall package

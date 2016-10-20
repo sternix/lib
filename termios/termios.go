@@ -134,7 +134,6 @@ func Tcflush(fd uintptr, which int) error {
 	default:
 		return syscall.EINVAL
 	}
-
 	return ioctl.Int(fd, TIOCFLUSH, &com)
 }
 
@@ -173,6 +172,5 @@ func Tcflow(fd uintptr, action int) error {
 		}
 		return nil
 	}
-
 	return syscall.EINVAL
 }
