@@ -10,11 +10,15 @@ import (
 
 func Isatty(fd uintptr) bool {
 	var t syscall.Termios
-	return (Tcgetattr(fd,&t) == nil)
+	return (Tcgetattr(fd, &t) == nil)
 }
 
-func GetWinsize(fd uintptr,ws *Winsize) error {
-	return ioctl.Winsize(fd,TIOCGWINSZ,ws)
+func GetWinsize(fd uintptr, ws *Winsize) error {
+	_, _, err := syscall.Syscall(syscall.SYS_IOCTL, fd, uintptr(TIOCGWINSZ), uintptr(unsafe.Pointer(ws)))
+	if err != 0 {
+		return err
+	}
+	return nil
 }
 
 func Tcgetattr(fd uintptr, termios *syscall.Termios) error {
