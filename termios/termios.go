@@ -2,6 +2,7 @@ package termios
 
 import (
 	"syscall"
+	"unsafe"
 )
 
 import (
