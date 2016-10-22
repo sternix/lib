@@ -10,7 +10,7 @@ import (
 
 func Isatty(fd uintptr) bool {
 	var t syscall.Termios
-	return (Tcgetattr(fd,&termios) == nil)
+	return (Tcgetattr(fd,&t) == nil)
 }
 
 func GetWinsize(fd uintptr,ws *Winsize) error {
