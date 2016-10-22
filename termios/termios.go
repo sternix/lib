@@ -8,6 +8,15 @@ import (
 	"github.com/sternix/lib/termios/ioctl"
 )
 
+func Isatty(fd uintptr) bool {
+	var t syscall.Termios
+	return (Tcgetattr(fd,&termios) == nil)
+}
+
+func GetWinsize(fd uintptr,ws *Winsize) error {
+	return ioctl.Winsize(fd,TIOCGWINSZ,ws)
+}
+
 func Tcgetattr(fd uintptr, termios *syscall.Termios) error {
 	return ioctl.Termios(fd, TIOCGETA, termios)
 }

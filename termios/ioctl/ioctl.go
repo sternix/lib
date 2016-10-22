@@ -13,6 +13,14 @@ func Termios(fd uintptr, request uint64, termios *syscall.Termios) error {
 	return nil
 }
 
+func Winsize(fd uintptr, request uint64, ws *Winsize) error {
+	_, _, err := syscall.Syscall(syscall.SYS_IOCTL, fd, uintptr(request), uintptr(unsafe.Pointer(ws)))
+	if err != 0 {
+		return err
+	}
+	return nil
+}
+
 func Int(fd uintptr, req uint64, i *int) error {
 	_, _, err := syscall.Syscall(syscall.SYS_IOCTL, fd, uintptr(req), uintptr(unsafe.Pointer(i)))
 	if err != 0 {
