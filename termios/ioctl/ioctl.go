@@ -5,10 +5,6 @@ import (
 	"unsafe"
 )
 
-import (
-	"github.com/sternix/lib/termios"
-)
-
 func Termios(fd uintptr, request uint64, termios *syscall.Termios) error {
 	_, _, err := syscall.Syscall(syscall.SYS_IOCTL, fd, uintptr(request), uintptr(unsafe.Pointer(termios)))
 	if err != 0 {
